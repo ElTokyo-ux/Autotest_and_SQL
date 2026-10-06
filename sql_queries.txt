@@ -1,0 +1,35 @@
+morty@server-bee030c7-3bca-4eb4-b13e-9ea5271e7cfd:~$ psql -h localhost -p 5432 -U morty -d scooter_rent
+Password for user morty:
+psql (11.18 (Debian 11.18-0+deb10u1))
+SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
+Type "help" for help.
+scooter_rent-# \d
+
+scooter_rent-# 
+SELECT
+    c.login,
+    COUNT(o.*) AS in_delivery_count
+FROM "Couriers" AS c
+JOIN "Orders" AS o ON c.id = o."courierId"
+WHERE o."inDelivery" = TRUE
+GROUP BY c.id, c.login
+ORDER BY c.login;
+
+scooter_rent-#
+SELECT
+    o.track,
+    CASE
+        WHEN o.finished = TRUE    THEN 2
+        WHEN o.cancelled = TRUE  THEN -1
+        WHEN o."inDelivery" = TRUE THEN 1
+        ELSE 0
+    END AS status
+FROM "Orders" AS o
+ORDER BY o.track;
+
+
+
+
+
+
+
