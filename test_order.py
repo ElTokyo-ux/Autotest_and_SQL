@@ -3,18 +3,26 @@
 from sender_stand_request import order_request
 from data.data import order_payload
 
-
-def test_get_order_by_track():
-    # 1. Выполнить запрос на создание заказа
+ # Создание заказа и возврат трека
+def test_create_order():
     response = order_request.post_create_order(order_payload.order_body)
-    assert response.status_code == 201
+    assert response.status_code == 201, f"Ожидался 201, получил {response.status_code}"
 
-    # 2. Сохранить номер трека заказа
-    track = response.json()["track"]
-    assert track is not None
+    data = response.json()
+    assert "track" in data, "В ответе нет поля track"
+    assert data["track"] is not None, "Track равен None"
 
-    # 3. Выполнить запрос на получение заказа по треку заказа
-    response_track = order_request.get_order_by_track(track)
+ #  Получение заказа по известному треку
+def test_get_order_by_track():
 
-    # 4. Проверить, что код ответа равен 200
-    assert response_track.status_code == 200
+    known_track = 325197
+
+    response_track = order_request.get_order_by_track(known_track)
+    assert response_track.status_code == 200, f"Ожидался 200, получил {response_track.status_code}"
+
+    data = response_track.json()
+    assert "order" in data, "В ответе нет объекта order"
+    assert "track" in data["order"], "В объекте order нет поля track"
+    
+
+    assert data["order"]["track"] == known_track, "Трек в ответе не совпадает с запрошенным"
